@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template for search-photos Lambda function
+
+Resources:
+  SearchPhotosFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: LF2.lambda_handler
+      Runtime: python3.9
+      CodeUri: s3://photo-album-artifacts/search-photos/  # Replace with your S3 bucket
+      MemorySize: 128
+      Timeout: 30
+      Policies: 
+          - AWSLambdaBasicExecutionRole
+
+      Environment:
+          Variables:
+              OPENSEARCH_ENDPOINT: 'search-photos-2iks6dqb6qtlhwbubkkgjpk3qy.us-east-1.es.amazonaws.com'
+
+  SearchPhotosApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: !Ref 'AWS::StackName'
+        paths:
+          /search: # Modified path to /search
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: post
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SearchPhotosFunction.Arn}/invocations
+
+Outputs:
+  SearchPhotosApiUrl:
+    Description: URL of the search-photos API endpoint
+    Value: !Sub 'https://${SearchPhotosApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/search'

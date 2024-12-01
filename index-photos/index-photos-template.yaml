@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template for index-photos Lambda function
+
+Resources:
+  IndexPhotosFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: LF1.lambda_handler
+      Runtime: python3.9
+      CodeUri: s3://photo-album-artifacts/index-photos/ # Replace with your S3 bucket name
+      MemorySize: 128
+      Timeout: 30
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonS3FullAccess # Add S3 access for interacting with photos
+        - AmazonRekognitionFullAccess # Add rekognition access
+      Environment:
+        Variables:
+          OPENSEARCH_ENDPOINT: 'search-photos-2iks6dqb6qtlhwbubkkgjpk3qy.us-east-1.es.amazonaws.com' # Assuming this is your OpenSearch endpoint
+
+  IndexPhotosInvokePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+          FunctionName: !Ref IndexPhotosFunction
+          Action: lambda:InvokeFunction
+          Principal: s3.amazonaws.com
+          SourceAccount: !Sub ${AWS::AccountId}
+
+Outputs:
+  IndexPhotosFunctionArn: # Added output for the function ARN
+    Value: !GetAtt IndexPhotosFunction.Arn
+    Description: The ARN of the IndexPhotos Lambda function
