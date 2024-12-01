@@ -95,7 +95,7 @@ def search_opensearch(keywords):
             'createdTimestamp': hit['_source']['createdTimestamp'],
             'labels': hit['_source']['labels']
         })
-
+    # Return the results
     return results
 
 
