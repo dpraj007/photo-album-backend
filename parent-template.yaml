@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Parent template for photo album backend
+
+Resources:
+  IndexPhotosStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub 's3://photo-album-artifacts/index-photos/packaged-index-photos-template.yaml' # Updated path
+      Capabilities: [CAPABILITY_IAM, CAPABILITY_AUTO_EXPAND]
+
+  SearchPhotosStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub 's3://photo-album-artifacts/search-photos/packaged-search-photos-template.yaml' # Updated path
+      Capabilities: [CAPABILITY_IAM, CAPABILITY_AUTO_EXPAND]
